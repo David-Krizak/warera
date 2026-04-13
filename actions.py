@@ -19,33 +19,18 @@ from game_selectors import (
 from readers import get_battle_percent, get_gear_status
 
 
-def _click_icon_by_path(page: Page, icon_d: str, timeout: int = 15000) -> None:
-    path = page.locator(f'{USER_MENU_SELECTOR} svg path[d="{icon_d}"]').first
-    path.wait_for(state="attached", timeout=timeout)
-
-    click_target = path.locator("xpath=ancestor::*[@role='button' or @aria-haspopup='dialog' or self::button][1]")
-    if click_target.count() > 0:
-        click_target.first.click(timeout=timeout)
-        return
-
-    svg_target = path.locator("xpath=ancestor::*[name()='svg'][1]")
-    if svg_target.count() > 0:
-        svg_target.first.click(timeout=timeout)
-        return
-
-    path.click(timeout=timeout)
-
-
 def _open_battles(page: Page) -> None:
-    page.locator(USER_MENU_SELECTOR).first.wait_for(state="visible", timeout=15000)
-    _click_icon_by_path(page, BATTLES_ICON_D, timeout=15000)
-    page.locator(FIRST_BATTLE_LINK).first.wait_for(state="visible", timeout=15000)
+    battles = page.locator(f'{USER_MENU_SELECTOR} svg path[d="{BATTLES_ICON_D}"]').first
+    battles.wait_for(state="visible", timeout=5000)
+    battles.click()
+    page.locator(FIRST_BATTLE_LINK).first.wait_for(state="visible", timeout=7000)
 
 
 def _open_inventory(page: Page) -> None:
-    page.locator(USER_MENU_SELECTOR).first.wait_for(state="visible", timeout=15000)
-    _click_icon_by_path(page, BACKPACK_ICON_D, timeout=15000)
-    page.locator("xpath=//*[normalize-space()='Equipment']").first.wait_for(state="visible", timeout=15000)
+    backpack = page.locator(f'{USER_MENU_SELECTOR} svg path[d="{BACKPACK_ICON_D}"]').first
+    backpack.wait_for(state="visible", timeout=5000)
+    backpack.click()
+    page.locator("xpath=//*[normalize-space()='Equipment']").first.wait_for(state="visible", timeout=7000)
 
 
 def _save_gear_snapshot(page: Page) -> None:
