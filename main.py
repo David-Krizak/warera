@@ -57,6 +57,8 @@ def main() -> None:
                 except Exception as e:
                     consecutive_failures += 1
                     print(f"[ERROR] Unexpected error: {e}")
+                    print("[INFO] Stopping script due to error")
+                    break
 
                 print(f"[INFO] Sleeping {LOOP_DELAY_SECONDS} seconds...\n")
                 time.sleep(LOOP_DELAY_SECONDS)
