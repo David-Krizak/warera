@@ -58,20 +58,13 @@ def main() -> None:
 
                         action = choose_action(stats)
                         if action is not None:
-                            try:
-                                perform_action(
-                                    page,
-                                    action,
-                                    ui_settle_seconds=UI_SETTLE_SECONDS,
-                                    hit_sleep_min_seconds=HIT_SLEEP_MIN_SECONDS,
-                                    hit_sleep_max_seconds=HIT_SLEEP_MAX_SECONDS,
-                                )
-                            except TypeError as e:
-                                if "unexpected keyword argument" in str(e):
-                                    print("[WARN] Legacy perform_action signature detected, retrying without kwargs")
-                                    perform_action(page, action)
-                                else:
-                                    raise
+                            perform_action(
+                                page,
+                                action,
+                                ui_settle_seconds=UI_SETTLE_SECONDS,
+                                hit_sleep_min_seconds=HIT_SLEEP_MIN_SECONDS,
+                                hit_sleep_max_seconds=HIT_SLEEP_MAX_SECONDS,
+                            )
                         else:
                             print("[LOGIC] No action selected")
 
