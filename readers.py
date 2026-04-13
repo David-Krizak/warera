@@ -46,7 +46,7 @@ def parse_int_like(text: Optional[str]) -> Optional[int]:
         return None
 
 
-def parse_money(text: Optional[str]) -> Optional[int]:
+def parse_money(text: Optional[str]) -> Optional[float]:
     if not text:
         return None
 
@@ -56,21 +56,15 @@ def parse_money(text: Optional[str]) -> Optional[int]:
     if not raw:
         return None
 
-    if "." in raw and "," not in raw:
-        parts = raw.split(".")
-        if len(parts) > 1 and all(len(p) == 3 for p in parts[1:]):
-            raw = "".join(parts)
+    if "." in raw and "," in raw:
+        raw = raw.replace(".", "").replace(",", ".")
     elif "," in raw and "." not in raw:
-        parts = raw.split(",")
-        if len(parts) > 1 and all(len(p) == 3 for p in parts[1:]):
-            raw = "".join(parts)
-        else:
-            raw = raw.replace(",", "")
+        raw = raw.replace(",", ".")
     else:
-        raw = raw.replace(".", "").replace(",", "")
+        raw = raw.replace(",", "")
 
     try:
-        return int(raw)
+        return float(raw)
     except ValueError:
         return None
 
@@ -134,7 +128,7 @@ def get_selfwork(page: Page) -> Optional[ResourceStat]:
     return get_stat_from_icon(page, SELFWORK_ICON_D)
 
 
-def get_money(page: Page) -> Optional[int]:
+def get_money(page: Page) -> Optional[float]:
     raw = get_text(page, MONEY_SELECTOR)
     return parse_money(raw)
 
