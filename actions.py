@@ -15,52 +15,22 @@ from game_selectors import (
     FIRST_BATTLE_LINK,
     ATTACK_BUTTON,
     DEFEND_BUTTON,
-    INVENTORY_LABEL_SELECTOR,
 )
 from readers import get_battle_percent, get_gear_status
 
 
-def _click_icon_by_path(page: Page, icon_d: str, timeout: int = 15000) -> None:
-    path = page.locator(f'{USER_MENU_SELECTOR} svg path[d="{icon_d}"]').first
-    path.wait_for(state="attached", timeout=timeout)
-
-    click_target = path.locator("xpath=ancestor::*[@role='button' or @aria-haspopup='dialog' or self::button][1]")
-    if click_target.count() > 0:
-        click_target.first.click(timeout=timeout)
-        return
-
-    svg_target = path.locator("xpath=ancestor::*[name()='svg'][1]")
-    if svg_target.count() > 0:
-        svg_target.first.click(timeout=timeout)
-        return
-
-    path.click(timeout=timeout)
-
-
 def _open_battles(page: Page) -> None:
-    page.locator(USER_MENU_SELECTOR).first.wait_for(state="visible", timeout=15000)
-    _click_icon_by_path(page, BATTLES_ICON_D, timeout=15000)
-    page.locator(FIRST_BATTLE_LINK).first.wait_for(state="visible", timeout=15000)
+    battles = page.locator(f'{USER_MENU_SELECTOR} svg path[d="{BATTLES_ICON_D}"]').first
+    battles.wait_for(state="visible", timeout=5000)
+    battles.click()
+    page.locator(FIRST_BATTLE_LINK).first.wait_for(state="visible", timeout=7000)
 
 
 def _open_inventory(page: Page) -> None:
-    page.locator(USER_MENU_SELECTOR).first.wait_for(state="visible", timeout=15000)
-
-    errors: list[str] = []
-
-    inventory_label = page.locator(INVENTORY_LABEL_SELECTOR).first
-    try:
-        inventory_label.wait_for(state="visible", timeout=8000)
-        inventory_label.locator("xpath=ancestor::div[contains(@class, '_1dnmndy1xq')][1]").first.click(timeout=8000)
-    except Exception as e:
-        errors.append(f"inventory-label-click failed: {e}")
-        try:
-            _click_icon_by_path(page, BACKPACK_ICON_D, timeout=15000)
-        except Exception as e2:
-            errors.append(f"backpack-path-click failed: {e2}")
-            raise RuntimeError("Stopped: cannot open inventory. " + " | ".join(errors))
-
-    page.locator("xpath=//*[normalize-space()='Equipment']").first.wait_for(state="visible", timeout=15000)
+    backpack = page.locator(f'{USER_MENU_SELECTOR} svg path[d="{BACKPACK_ICON_D}"]').first
+    backpack.wait_for(state="visible", timeout=5000)
+    backpack.click()
+    page.locator("xpath=//*[normalize-space()='Equipment']").first.wait_for(state="visible", timeout=7000)
 
 
 def _save_gear_snapshot(page: Page) -> None:

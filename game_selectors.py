@@ -40,4 +40,3 @@ BACKPACK_ICON_D = "M16,5V4A2,2 0 0,0 14,2H10A2,2 0 0,0 8,4V5A4,4 0 0,0 4,9V20A2,
 FIRST_BATTLE_LINK = 'a[href^="/battle/"]'
 ATTACK_BUTTON = "#attacker-hit-button button"
 DEFEND_BUTTON = "#defender-hit-button button"
-INVENTORY_LABEL_SELECTOR = "xpath=//span[normalize-space()='Inventory']"
