@@ -15,6 +15,7 @@ from game_selectors import (
     SELFWORK_ICON_D,
 )
 from models import GameStats, ResourceStat
+from models import GearStatus
 
 
 def extract_numbers(text: str) -> list[float]:
@@ -45,7 +46,7 @@ def parse_int_like(text: Optional[str]) -> Optional[int]:
         return None
 
 
-def parse_money(text: Optional[str]) -> Optional[int]:
+def parse_money(text: Optional[str]) -> Optional[float]:
     if not text:
         return None
 
@@ -55,21 +56,15 @@ def parse_money(text: Optional[str]) -> Optional[int]:
     if not raw:
         return None
 
-    if "." in raw and "," not in raw:
-        parts = raw.split(".")
-        if len(parts) > 1 and all(len(p) == 3 for p in parts[1:]):
-            raw = "".join(parts)
+    if "." in raw and "," in raw:
+        raw = raw.replace(".", "").replace(",", ".")
     elif "," in raw and "." not in raw:
-        parts = raw.split(",")
-        if len(parts) > 1 and all(len(p) == 3 for p in parts[1:]):
-            raw = "".join(parts)
-        else:
-            raw = raw.replace(",", "")
+        raw = raw.replace(",", ".")
     else:
-        raw = raw.replace(".", "").replace(",", "")
+        raw = raw.replace(",", "")
 
     try:
-        return int(raw)
+        return float(raw)
     except ValueError:
         return None
 
@@ -133,7 +128,7 @@ def get_selfwork(page: Page) -> Optional[ResourceStat]:
     return get_stat_from_icon(page, SELFWORK_ICON_D)
 
 
-def get_money(page: Page) -> Optional[int]:
+def get_money(page: Page) -> Optional[float]:
     raw = get_text(page, MONEY_SELECTOR)
     return parse_money(raw)
 
@@ -183,3 +178,75 @@ def debug_icon_stats(page: Page) -> None:
             print(f"[DEBUG] {name}: {block.inner_text().strip()!r}")
         except Exception as e:
             print(f"[DEBUG] {name}: failed to read block: {e}")
+
+
+def extract_signed_percent(text: str) -> Optional[int]:
+    match = re.search(r"([+-]?\d+)\s*%", text)
+    if not match:
+        return None
+    try:
+        return int(match.group(1))
+    except ValueError:
+        return None
+
+
+def get_battle_percent(page: Page, side: str) -> Optional[int]:
+    side_id = "attacker-hit-button" if side == "attack" else "defender-hit-button"
+    loc = page.locator(f"#{side_id}").first
+    try:
+        loc.wait_for(state="visible", timeout=4000)
+        return extract_signed_percent(loc.inner_text())
+    except Exception:
+        return None
+
+
+def _parse_last_percent(text: str) -> Optional[int]:
+    matches = re.findall(r"(\d+)\s*%", text)
+    if not matches:
+        return None
+    return int(matches[-1])
+
+
+def _parse_last_plain_int(text: str) -> Optional[int]:
+    matches = re.findall(r"\b\d+\b", text)
+    if not matches:
+        return None
+    return int(matches[-1])
+
+
+def _get_equipment_card_text(page: Page, label: str) -> Optional[str]:
+    candidates = [
+        f"xpath=//div[normalize-space()='{label}']/parent::div/parent::div",
+        f"xpath=//*[normalize-space()='{label}']/ancestor::div[2]",
+    ]
+    for selector in candidates:
+        loc = page.locator(selector).first
+        try:
+            if loc.count() == 0:
+                continue
+            txt = loc.inner_text().strip()
+            if label in txt:
+                return txt
+        except Exception:
+            continue
+    return None
+
+
+def get_gear_status(page: Page) -> GearStatus:
+    weapon_txt = _get_equipment_card_text(page, "Weapon") or ""
+    ammo_txt = _get_equipment_card_text(page, "Ammo") or ""
+    helmet_txt = _get_equipment_card_text(page, "Helmet") or ""
+    chest_txt = _get_equipment_card_text(page, "Chest") or ""
+    pants_txt = _get_equipment_card_text(page, "Pants") or ""
+    boots_txt = _get_equipment_card_text(page, "Boots") or ""
+    gloves_txt = _get_equipment_card_text(page, "Gloves") or ""
+
+    return GearStatus(
+        weapon_durability=_parse_last_percent(weapon_txt),
+        ammo_count=_parse_last_plain_int(ammo_txt),
+        helmet_durability=_parse_last_percent(helmet_txt),
+        chest_durability=_parse_last_percent(chest_txt),
+        pants_durability=_parse_last_percent(pants_txt),
+        boots_durability=_parse_last_percent(boots_txt),
+        gloves_durability=_parse_last_percent(gloves_txt),
+    )
