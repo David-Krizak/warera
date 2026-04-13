@@ -18,7 +18,7 @@ def choose_action(stats: Optional[GameStats]) -> Optional[str]:
     if stats is None:
         return None
 
-    if can_do_work(stats, min_energy=30, min_selfwork=10):
-        return "work"
+    if stats.health.current is not None and stats.health.current > 0:
+        return "battle"
 
     return None

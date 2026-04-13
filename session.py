@@ -39,11 +39,16 @@ def attach_debug_hooks(page: Page) -> None:
     )
 
 
-def open_game(playwright: Playwright) -> Tuple[BrowserContext, Page]:
+def open_game(
+    playwright: Playwright,
+    *,
+    headless: bool = False,
+    startup_wait_seconds: int = INITIAL_WAIT_SECONDS,
+) -> Tuple[BrowserContext, Page]:
     context = playwright.chromium.launch_persistent_context(
         CHROME_USER_DATA_DIR,
         channel="chrome",
-        headless=False,
+        headless=headless,
         args=["--profile-directory=Default"],
         viewport={"width": 1600, "height": 900},
     )
@@ -62,7 +67,7 @@ def open_game(playwright: Playwright) -> Tuple[BrowserContext, Page]:
         raise RuntimeError("Not logged in")
 
     print("[SUCCESS] Logged in")
-    print(f"[INFO] Waiting {INITIAL_WAIT_SECONDS} seconds before reading selectors...")
-    time.sleep(INITIAL_WAIT_SECONDS)
+    print(f"[INFO] Waiting {startup_wait_seconds} seconds before reading selectors...")
+    time.sleep(startup_wait_seconds)
 
     return context, page
