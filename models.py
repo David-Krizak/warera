@@ -18,7 +18,7 @@ class GameStats:
     eating: ResourceStat
     energy: ResourceStat
     selfwork: ResourceStat
-    money: Optional[float]
+    money: Optional[int]
     level: Optional[int]
 
 

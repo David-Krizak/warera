@@ -40,9 +40,3 @@ BACKPACK_ICON_D = "M16,5V4A2,2 0 0,0 14,2H10A2,2 0 0,0 8,4V5A4,4 0 0,0 4,9V20A2,
 FIRST_BATTLE_LINK = 'a[href^="/battle/"]'
 ATTACK_BUTTON = "#attacker-hit-button button"
 DEFEND_BUTTON = "#defender-hit-button button"
-INVENTORY_LABEL_SELECTOR = "xpath=//span[normalize-space()='Inventory']"
-INVENTORY_BUTTON_XPATH = 'xpath=//*[@id="__next"]/div/div[4]/div/a[1]/div[1]'
-INVENTORY_BUTTON_XPATH_ABS = "xpath=/html/body/div[1]/div/div[4]/div/a[1]/div[1]"
-INVENTORY_LINK_SELECTOR = 'a[href*="/inventory"]'
-INVENTORY_FALLBACK_URL = "https://app.warera.io/user/69d618da5e1e691e0a03f199/inventory"
-BATTLE_GEAR_PANEL_XPATH = 'xpath=//*[@id="main-window"]/div[1]/div[1]/div/div/div/div[3]/div[2]/div/div/div[2]'
