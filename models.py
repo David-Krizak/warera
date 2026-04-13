@@ -18,5 +18,16 @@ class GameStats:
     eating: ResourceStat
     energy: ResourceStat
     selfwork: ResourceStat
-    money: Optional[int]
+    money: Optional[float]
     level: Optional[int]
+
+
+@dataclass(frozen=True)
+class GearStatus:
+    weapon_durability: Optional[int]
+    ammo_count: Optional[int]
+    helmet_durability: Optional[int]
+    chest_durability: Optional[int]
+    pants_durability: Optional[int]
+    boots_durability: Optional[int]
+    gloves_durability: Optional[int]
