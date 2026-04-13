@@ -10,6 +10,13 @@ from logic import choose_action
 from readers import get_all_stats, debug_icon_stats
 from session import open_game
 
+# Global runtime knobs
+HEADLESS = False
+STARTUP_WAIT_SECONDS = 8
+UI_SETTLE_SECONDS = 2.0
+HIT_SLEEP_MIN_SECONDS = 1
+HIT_SLEEP_MAX_SECONDS = 5
+
 
 def print_stats(stats) -> None:
     print("\n=== STATS ===")
@@ -23,7 +30,11 @@ def print_stats(stats) -> None:
 
 def main() -> None:
     with sync_playwright() as playwright:
-        context, page = open_game(playwright)
+        context, page = open_game(
+            playwright,
+            headless=HEADLESS,
+            startup_wait_seconds=STARTUP_WAIT_SECONDS,
+        )
 
         try:
             debug_icon_stats(page)
@@ -47,7 +58,13 @@ def main() -> None:
 
                         action = choose_action(stats)
                         if action is not None:
-                            perform_action(page, action)
+                            perform_action(
+                                page,
+                                action,
+                                ui_settle_seconds=UI_SETTLE_SECONDS,
+                                hit_sleep_min_seconds=HIT_SLEEP_MIN_SECONDS,
+                                hit_sleep_max_seconds=HIT_SLEEP_MAX_SECONDS,
+                            )
                         else:
                             print("[LOGIC] No action selected")
 
